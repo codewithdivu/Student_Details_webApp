@@ -13,6 +13,15 @@ class Students extends Component {
     },
   };
 
+  componentDidMount() {
+    if (localStorage.getItem("tableData")) {
+      this.setState({
+        ...this.state,
+        moko: JSON.parse(localStorage.getItem("tableData")),
+      });
+    }
+  }
+
   handleSubmit = (event) => {
     event.preventDefault();
     if (this.state.isEditMode) {
@@ -22,6 +31,7 @@ class Students extends Component {
           ? { ...this.state.userData }
           : item;
       });
+      localStorage.setItem("tableData", JSON.stringify(copyData));
       this.setState({
         isEditMode: false,
         moko: [...copyData],
@@ -33,6 +43,10 @@ class Students extends Component {
         },
       });
     } else {
+      localStorage.setItem(
+        "tableData",
+        JSON.stringify([...this.state.moko, { ...this.state.userData }])
+      );
       this.setState({
         isEditMode: false,
         moko: [...this.state.moko, { ...this.state.userData }],
@@ -58,6 +72,10 @@ class Students extends Component {
   handleDelete = (tabIndex) => {
     let arr = [...this.state.moko];
     arr = arr.filter((item, index) => index !== tabIndex);
+    localStorage.setItem(
+      "tableData",
+      JSON.stringify(arr)
+    );
     this.setState({
       ...this.state,
       moko: arr,
