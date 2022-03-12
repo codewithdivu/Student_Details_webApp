@@ -4,6 +4,7 @@ import Details from "./Details";
 class Students extends Component {
   state = {
     moko: [],
+    isEditMode: false,
     userData: {
       name: "",
       er_no: "",
@@ -14,14 +15,53 @@ class Students extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
+    if (this.state.isEditMode) {
+      let copyData = [...this.state.moko];
+      copyData = copyData.map((item, index) => {
+        return index === this.state.isEditMode
+          ? { ...this.state.userData }
+          : item;
+      });
+      this.setState({
+        isEditMode: false,
+        moko: [...copyData],
+        userData: {
+          name: "",
+          er_no: "",
+          email: "",
+          password: "",
+        },
+      });
+    } else {
+      this.setState({
+        isEditMode: false,
+        moko: [...this.state.moko, { ...this.state.userData }],
+        userData: {
+          name: "",
+          er_no: "",
+          email: "",
+          password: "",
+        },
+      });
+    }
+  };
+
+  handleEdit = (editIndex) => {
+    let editDate = this.state.moko[editIndex];
     this.setState({
       ...this.state,
-      moko: [...this.state.moko, { ...this.state.userData }],
+      isEditMode: editIndex,
+      userData: { ...editDate },
     });
-    // console.log(this.state.userData.name);
-    // console.log(this.state.userData.er_no);
-    // console.log(this.state.userData.email);
-    // console.log(this.state.userData.password);
+  };
+
+  handleDelete = (tabIndex) => {
+    let arr = [...this.state.moko];
+    arr = arr.filter((item, index) => index !== tabIndex);
+    this.setState({
+      ...this.state,
+      moko: arr,
+    });
   };
 
   render() {
@@ -114,11 +154,15 @@ class Students extends Component {
           </div>
 
           <button type="submit" className="btn btn-primary">
-            Submit
+            {this.state.isEditMode ? "Update" : "Add"}
           </button>
         </form>
 
-        <Details array={this.state.moko} />
+        <Details
+          array={this.state.moko}
+          onDelete={this.handleDelete}
+          onEdit={this.handleEdit}
+        />
       </div>
     );
   }
