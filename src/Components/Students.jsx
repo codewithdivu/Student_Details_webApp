@@ -22,8 +22,23 @@ class Students extends Component {
     }
   }
 
-  handleSubmit = (event) => {
+  handleValidation = (data) => {
+    let inValid = [];
+    Object.keys(data).forEach((value, index) => {
+      if (!data[value]) {
+        inValid.push(value);
+      }
+    });
+    return inValid.length > 0 ? inValid : "";
+  };
+
+  handleSubmit = async (event) => {
     event.preventDefault();
+
+    const isInvalid = await this.handleValidation(this.state.userData);
+
+    if (isInvalid) return alert(`${isInvalid?.toString()} is invalid`);
+
     if (this.state.isEditMode) {
       let copyData = [...this.state.moko];
       copyData = copyData.map((item, index) => {
@@ -72,10 +87,7 @@ class Students extends Component {
   handleDelete = (tabIndex) => {
     let arr = [...this.state.moko];
     arr = arr.filter((item, index) => index !== tabIndex);
-    localStorage.setItem(
-      "tableData",
-      JSON.stringify(arr)
-    );
+    localStorage.setItem("tableData", JSON.stringify(arr));
     this.setState({
       ...this.state,
       moko: arr,
