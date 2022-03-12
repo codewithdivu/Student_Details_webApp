@@ -24,7 +24,7 @@ class Students extends Component {
 
   handleValidation = (data) => {
     let inValid = [];
-    Object.keys(data).forEach((value, index) => {
+    Object.keys(data).forEach((value) => {
       if (!data[value]) {
         inValid.push(value);
       }
@@ -96,7 +96,8 @@ class Students extends Component {
 
   render() {
     return (
-      <div>
+      <div className="container-fluid">
+        <h1 className="text-center mt-2">Student Details WebApp</h1>
         <form onSubmit={this.handleSubmit}>
           <div className="form-group">
             <label for="exampleInputText">Name</label>
@@ -183,7 +184,7 @@ class Students extends Component {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-primary mt-3">
             {this.state.isEditMode ? "Update" : "Add"}
           </button>
         </form>
