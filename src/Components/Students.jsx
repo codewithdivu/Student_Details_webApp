@@ -1,5 +1,8 @@
 import React, { Component } from "react";
+import { addUser, deleteUser, updateUser } from "../Services/apiService";
 import Details from "./Details";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../config";
 
 class Students extends Component {
   state = {
@@ -14,12 +17,16 @@ class Students extends Component {
   };
 
   componentDidMount() {
-    if (localStorage.getItem("tableData")) {
-      this.setState({
-        ...this.state,
-        moko: JSON.parse(localStorage.getItem("tableData")),
+    const q = query(collection(db, "users"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const cities = [];
+      querySnapshot.forEach((doc) => {
+        cities.push(doc.data());
       });
-    }
+      console.log("cities", cities);
+      this.setState({ ...this.state, moko: cities });
+      // console.log("Current cities in CA: ", cities.join(", "));
+    });
   }
 
   handleValidation = (data) => {
@@ -40,58 +47,54 @@ class Students extends Component {
     if (isInvalid) return alert(`${isInvalid?.toString()} is invalid`);
 
     if (this.state.isEditMode) {
-      let copyData = [...this.state.moko];
-      copyData = copyData.map((item, index) => {
-        return index === this.state.isEditMode
-          ? { ...this.state.userData }
-          : item;
-      });
-      localStorage.setItem("tableData", JSON.stringify(copyData));
-      this.setState({
-        isEditMode: false,
-        moko: [...copyData],
-        userData: {
-          name: "",
-          er_no: "",
-          email: "",
-          password: "",
-        },
-      });
+      // let copyData = [...this.state.moko];
+      // copyData = copyData.map((item, index) => {
+      //   return index === this.state.isEditMode
+      //     ? { ...this.state.userData }
+      //     : item;
+      // });
+      // localStorage.setItem("tableData", JSON.stringify(copyData));
+      const isUserUpdated = await updateUser(this.state.userData);
+      if (isUserUpdated) {
+        this.setState({
+          ...this.state,
+          isEditMode: false,
+          userData: {
+            name: "",
+            er_no: "",
+            email: "",
+            password: "",
+          },
+        });
+      }
     } else {
-      localStorage.setItem(
-        "tableData",
-        JSON.stringify([...this.state.moko, { ...this.state.userData }])
-      );
-      this.setState({
-        isEditMode: false,
-        moko: [...this.state.moko, { ...this.state.userData }],
-        userData: {
-          name: "",
-          er_no: "",
-          email: "",
-          password: "",
-        },
-      });
+      const isUserAdded = await addUser(this.state.userData);
+      if (isUserAdded) {
+        this.setState({
+          isEditMode: false,
+          userData: {
+            name: "",
+            er_no: "",
+            email: "",
+            password: "",
+          },
+        });
+      }
     }
   };
 
-  handleEdit = (editIndex) => {
-    let editDate = this.state.moko[editIndex];
+  handleEdit = (editId) => {
+    let editDate = this.state.moko.find((user) => user.id === editId);
+    console.log("editDate :>> ", editDate);
     this.setState({
       ...this.state,
-      isEditMode: editIndex,
+      isEditMode: editId,
       userData: { ...editDate },
     });
   };
 
-  handleDelete = (tabIndex) => {
-    let arr = [...this.state.moko];
-    arr = arr.filter((item, index) => index !== tabIndex);
-    localStorage.setItem("tableData", JSON.stringify(arr));
-    this.setState({
-      ...this.state,
-      moko: arr,
-    });
+  handleDelete = async (deleteId) => {
+    await deleteUser(deleteId);
   };
 
   render() {

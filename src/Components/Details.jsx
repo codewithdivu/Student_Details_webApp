@@ -26,7 +26,7 @@ class Details extends Component {
                   <td>
                     <button
                       className="btn btn-primary btn-sm"
-                      onClick={() => this.props.onEdit(index)}
+                      onClick={() => this.props.onEdit(c.id)}
                     >
                       Edit
                     </button>
@@ -34,7 +34,7 @@ class Details extends Component {
                   <td>
                     <button
                       className="btn btn-danger btn-sm"
-                      onClick={() => this.props.onDelete(index)}
+                      onClick={() => this.props.onDelete(c.id)}
                     >
                       Delete
                     </button>
